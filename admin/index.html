@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+<style>
+	@import url('https://fonts.googleapis.com/css?family=Roboto:100,400');
+	.x{
+		width: 100vw;
+		display: none;
+		height: 100vh;
+		font-size: 70vh;
+		top:0;
+		left: 0;
+		z-index: 1111111;
+		position: fixed;
+		text-align: center;
+		font-family: Roboto;
+		font-weight: 100;
+		color: white;
+		background: #cb2d3e;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #ef473a, #cb2d3e);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #ef473a, #cb2d3e); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+		align-content: center;
+		vertical-align: middle;
+	}
+
+canvas{
+	display: none;
+  position: absolute;
+  width: 100%; height: 100%;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
+</style>
+  </head>
+  <body>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+    <script>
+		      $(function () {
+		var socket = io('/admin/');
+				  
+				function respond(socket,response){
+			     socket.emit('response',socket,response);
+		         }
+				  
+		  socket.on('disconnect', function(){
+             $('.x').show();
+			 $('#extra').html('Connection lost');
+           });
+		socket.on('ask', function(ask,socket,level){
+			    $('.x').hide();
+                console.log(ask,socket,level);
+                var w = window.open("", 'Εισερχόμενη σύνδεση από:' + socket, "width=600, height=500, scrollbars=yes");
+                var $w = $(w.document.body);
+			    window.respond = respond;
+				var tag="'response','"+socket+"','"+ ask['team'] +"'";
+			var space ="'/admin/'"
+				$w.html('<body><title>ΕΙΣΕΡΧΟΜΕΝΗ ΣΥΝΔΕΣΗ</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"><table><thead><tr><th>Ομάδα</th><th>Τρέχον Γρίφος</th></tr></thead><tbody><tr><td>'+ ask['team'] +'</td><td>' + level + '</td></tr></tbody></table><table><thead><tr><th>Απάντηση</th></tr></thead><tbody><tr><td>'+ ask['answer'] +'</td></tr></tbody></table><table><thead><tr><th>Δικαιολόγηση</th></tr></thead><tbody><tr><td>'+ ask['explanation'] +'</td></tr></tbody></table></div><br><button style="position: fixed;border:none;color:white;background:#0ad665; bottom:0; left:0; width:50vw; height:10vh;" onClick="var socket=window.opener.io('+space+');socket.emit('+tag +',1'+');window.close();">Σωστό</button><button style="position: fixed; border:none; bottom:0; right:0; width:50vw; color:white; background: #e80439;height:10vh;" onClick="var socket=window.opener.io('+space+');socket.emit('+tag +',0'+');window.close();">Λάθος</button><body>');
+           });
+
+			  });
+
+    </script>
+    
+<div class="x" style="margin-bottom: auto; margin-top: auto;">
+<h3 id="extra"></h3>
+x
+</div>
+ <div style="color: darkgray; margin-top:40vh; width: 100vw; position:fixed; display: inline; text-align: center;"><i class="large material-icons" style="display: inline-block;">all_inclusive</i><br>Όλες οι καινούργιες συνδέσεις θα εμφανισθούν σε νέο παράθυρο. Παρακαλώ μην με κλείσετε!</div>
+          
+<div style="width: 100vw;height: 10vh;bottom: 0; position: absolute;  background: linear-gradient(to right, #4ecdc4, #556270);"></div>
+  </body>
+</html>
+

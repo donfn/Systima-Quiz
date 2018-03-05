@@ -1,0 +1,323 @@
+<!doctype html>
+<html>
+ <meta charset="utf-8">
+  <head>
+<style>
+	@import url('https://fonts.googleapis.com/css?family=Roboto:100,400');
+	.x{
+		width: 100vw;
+		display: none;
+		height: 100vh;
+		font-size: 70vh;
+		top:0;
+		left: 0;
+		z-index: 1111111;
+		position: fixed;
+		text-align: center;
+		font-family: Roboto;
+		font-weight: 100;
+		color: white;
+		background: #cb2d3e; 
+        background: -webkit-linear-gradient(to right, #ef473a, #cb2d3e); 
+        background: linear-gradient(to right, #ef473a, #cb2d3e);
+        align-content: center;
+		vertical-align: middle;
+	}
+
+canvas{
+	display: none;
+  position: absolute;
+  width: 100%; height: 100%;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
+	::-webkit-scrollbar { 
+    display: none; 
+}
+</style>
+  </head>
+  <body>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+    <script>
+		var socket = io('/clients/');
+		  socket.on('disconnect', function(){
+                $('.x').show();
+				$.playSound(document.location.hostname + '/buzz.mp3');
+  });
+		  $(document).ready(function() {
+			  $('.modal').modal();
+    $('#dropdown').material_select();
+    $('#dropdown').change(function(){
+		$('#drop').fadeOut(300);
+		$('#submit').delay(400).fadeIn(300);
+		$('#ask_text').on('input', function() {
+			if($('#ask_text').val == null){
+				$('#btn').hide();
+			}
+			if($('#ask_text').val !== null){
+				$('#btn').show();
+			}
+		});
+	});
+			  var canvasDots = function() {
+  var canvas = document.querySelector('canvas'),
+      ctx = canvas.getContext('2d'),
+      colorDot = '#00bdbf',
+      color = '#00bdbf';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx.fillStyle = colorDot;
+  ctx.lineWidth = .1;
+  ctx.strokeStyle = color;
+
+  var mousePosition = {
+    x: 30 * canvas.width / 100,
+    y: 30 * canvas.height / 100
+  };
+
+  var dots = {
+    nb: 350,
+    distance: 60,
+    d_radius: 100,
+    array: []
+  };
+
+  function Dot(){
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+
+    this.vx = -.5 + Math.random();
+    this.vy = -.5 + Math.random();
+
+    this.radius = Math.random();
+  }
+
+  Dot.prototype = {
+    create: function(){
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      ctx.fill();
+    },
+
+    animate: function(){
+      for(i = 0; i < dots.nb; i++){
+
+        var dot = dots.array[i];
+
+        if(dot.y < 0 || dot.y > canvas.height){
+          dot.vx = dot.vx;
+          dot.vy = - dot.vy;
+        }
+        else if(dot.x < 0 || dot.x > canvas.width){
+          dot.vx = - dot.vx;
+          dot.vy = dot.vy;
+        }
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+      }
+    },
+
+    line: function(){
+      for(i = 0; i < dots.nb; i++){
+        for(j = 0; j < dots.nb; j++){
+          i_dot = dots.array[i];
+          j_dot = dots.array[j];
+
+          if((i_dot.x - j_dot.x) < dots.distance && (i_dot.y - j_dot.y) < dots.distance && (i_dot.x - j_dot.x) > - dots.distance && (i_dot.y - j_dot.y) > - dots.distance){
+            if((i_dot.x - mousePosition.x) < dots.d_radius && (i_dot.y - mousePosition.y) < dots.d_radius && (i_dot.x - mousePosition.x) > - dots.d_radius && (i_dot.y - mousePosition.y) > - dots.d_radius){
+              ctx.beginPath();
+              ctx.moveTo(i_dot.x, i_dot.y);
+              ctx.lineTo(j_dot.x, j_dot.y);
+              ctx.stroke();
+              ctx.closePath();
+            }
+          }
+        }
+      }
+    }
+  };
+
+  function createDots(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(i = 0; i < dots.nb; i++){
+      dots.array.push(new Dot());
+      dot = dots.array[i];
+
+      dot.create();
+    }
+
+    dot.line();
+    dot.animate();
+  }
+
+  window.onmousemove = function(parameter) {
+    mousePosition.x = parameter.pageX;
+    mousePosition.y = parameter.pageY;
+  }
+
+  mousePosition.x = window.innerWidth / 2;
+  mousePosition.y = window.innerHeight / 2;
+
+  setInterval(createDots, 1000/30); 
+};
+
+window.onload = function() {
+  canvasDots();
+};
+  });
+      $(function () {
+        var socket = io('/clients/');
+		  		  jQuery.status = "";
+        socket.on('init_data', function(data){
+		  var datatype = data ;
+          var newstatus = datatype['0']['value'];
+			if($.status !== newstatus){
+			$.status = newstatus;
+			if($.status == "on"){
+				$('.x').hide();
+			}
+			if($.status == "off"){
+                $('.x').show();
+				$.playSound('/inc/buzz.mp3');
+
+      } 
+			}})});
+		
+		(function ($) {
+    $.extend({
+        playSound: function () {
+            return $(
+                   '<audio class="sound-player" autoplay="autoplay" style="display:none;">'
+                     + '<source src="' + arguments[0] + '" />'
+                     + '<embed src="' + arguments[0] + '" hidden="true" autostart="true" loop="false"/>'
+                   + '</audio>'
+                 ).appendTo('body');
+        },
+        stopSound: function () {
+            $(".sound-player").remove();
+        }
+    });
+})(jQuery);
+		function encode_utf8(s) { 
+
+ return unescape(encodeURIComponent(s)); 
+
+} 
+		
+		$(function() { // wait for the DOM to be ready
+			var socket = io('/clients/');
+    $('#foo').submit(function(e) { // bind function to submit event of form
+		  $('#submit').hide();
+		    e.preventDefault();
+		    var ask = {
+           team: $('#dropdown').val() ,
+		   answer: $('#ask_text').val(),
+		   explanation: $('#ask_explanation').val()
+			};
+            socket.emit('ask', ask);
+		    console.log(ask);
+		    Materialize.toast('Παρακαλώ περίμενε, ελέγχουμε την απάντηση σου...');
+		    $('#wait').fadeIn(1000);
+		    $('#progress').fadeIn(1000);
+		    $('#ask_text').val('');
+		    $('#ask_explanation').val('');
+		    $('#dropdown').val('0');
+		    socket.on('ask_response', function(status){
+			Materialize.Toast.removeAll();
+			if(status == "1"){
+				Materialize.toast('Η απάντηση σου ήταν σωστή!', 4000);
+				socket.on('nextone', function(text){
+				$('#modal1').modal('open');
+				$('#nextone').html(text);
+				console.log(text);
+				});
+				$('#progress').hide();
+				$('#wait').delay(1000).fadeOut(400);
+			}
+			if(status == "0"){
+				Materialize.toast('Η απάντηση σου ήταν λάθος!', 6000);
+				document.querySelector('canvas').getContext('2d').strokeStyle = '#ff0018';
+				document.querySelector('canvas').getContext('2d').fillStyle = '#ff0018';
+				$('#wait').delay(1000).fadeOut(400);
+				$('#progress').hide(400);
+
+      } 
+				$('select').prop('selectedIndex', 0); //Sets the first option as selected
+                $('select').material_select(); 
+				$('#drop').delay(1500).fadeIn(400);
+				setTimeout(function(){document.querySelector('canvas').getContext('2d').strokeStyle = '#00bdbf'; document.querySelector('canvas').getContext('2d').fillStyle = '#00bdbf';},2000);
+			}
+            );
+        })});
+
+    </script>
+    
+<div class="x">
+<h3 id="extra"></h3>
+<div style="margin-bottom: auto; margin-top: auto;">x</div>
+</div>
+<center>
+<div style="width: 50vw; height:auto; margin-top: 40vh;">
+ <form id="foo"  autocomplete="off" >
+     <div class="input-field col s12" style="width: 50vw; height:auto;" id="drop">
+    <select name="team" id="dropdown" >
+      <option value="0" disabled selected>Επέλεξε την ομάδα σου:</option>
+      <option value="ΕΜΜ.ΣΚΟΥΛΑΣ">ΕΜΜ.ΣΚΟΥΛΑΣ</option>
+      <option value="ΠΑΝ.ΚΟΡΩΝΑΙΟΣ">ΠΑΝ.ΚΟΡΩΝΑΙΟΣ</option>
+      <option value="Ι.ΔΗΜΑΚΟΠΟΥΛΟΣ">Ι.ΔΗΜΑΚΟΠΟΥΛΟΣ</option>
+      <option value="ΧΑΡ.ΔΑΣΚΑΛΑΚΗ">ΧΑΡ.ΔΑΣΚΑΛΑΚΗ</option>
+       <option value="Κ.ΓΙΑΜΠΟΥΔΑΚΗΣ">Κ.ΓΙΑΜΠΟΥΔΑΚΗΣ</option>
+      <option value="ΗΓ.ΓΑΒΡΙΗΛ">ΗΓ.ΓΑΒΡΙΗΛ</option>
+      <option value="ΜΙΧ.ΚΟΡΑΚΑΣ">ΜΙΧ.ΚΟΡΑΚΑΣ</option>
+                              
+    </select>
+  </div>
+  <div id="submit" style="display: none;">
+  <textarea class="materialize-textarea" placeholder="Απάντηση: (Θυμήσου! ακόμη και να είναι σωστή, εάν δεν δώσεις δικαιολόγηση θα στην πάρουμε λάθος!)" name="answer" id="ask_text"></textarea>
+  <textarea class="materialize-textarea" placeholder="Δικαιολόγηση:" name="answer" id="ask_explanation"></textarea>
+  <input type="submit" value="ΥΠΟΒΟΛΗ" id="btn" class="waves-effect waves-light btn"></div>
+</form>
+<canvas id="wait" style="display: none;"></canvas>
+<div id="result" style="font-size: 7vh; margin: 50px;"></div>
+</div>
+ </center>
+ 
+ <!-- Επόμενος γρύφος -->
+  <div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content"><center>
+      <h2 style="z-index: 1;"><img src="/inc/tick.png" width="30w" style=" z-index: 30" height="auto">   Σωστό</h2>
+     <h6 style="font-size: 1.5vh; color: darkgray;">Συγχαρητήρια! Σημείωσε γρήγορα τον παρακάτω γρίφο και παράδωσε τον στην ομάδα σου:</h6><br><br><h3>&#147;</h3><p style="font-size: 1.5vh; color: darkgray;" id="nextone">Eδώ έπρεπε να υπάρχει ο επόμενος γρύφος...Εάν διαβάζεις αυτό το μύνημα,κάτι έχει πάει στραβά...Τρέχα γρήγορα στο γραφείο να στον δώσουμε χειρόγραφα! ΤΡΕΧΑ@#$%^!!!!!</p><br><h3>&#148;</h3>
+      </center>
+    </div>
+    <div class="modal-footer">
+      <a href="#!"  onClick="$('#nextone').html('Eδώ έπρεπε να υπάρχει ο επόμενος γρίφος...Εάν διαβάζεις αυτό το μύνημα,κάτι έχει πάει στραβά...Τρέχα γρήγορα στο γραφείο να στον δώσουμε χειρόγραφα! ΤΡΕΧΑ@#$%^!!!!!');" class="modal-action modal-close waves-effect waves-green btn-flat ">ΟΚ</a>
+    </div>
+  </div>
+        <div class="progress" style="top: 0vh; position: fixed; display: none;" id="progress">
+      <div class="indeterminate"></div>
+  </div>   
+  
+        <footer class="page-footer" style="top:100vh; width: 99vw; position: absolute;">
+          <div class="container">
+            <div class="row">
+              <div class="col l6 s12">
+                <h4 class="white-text">Γειά σου!</h4>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright">
+            <div class="container">
+            Μουσικό Σχολείο Ρεθύμνου 2017
+            </div>
+          </div>
+        </footer>
+  </body>
+</html>
+

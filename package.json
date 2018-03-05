@@ -1,0 +1,23 @@
+{
+  "name": "socket-chat-example",
+  "version": "0.0.1",
+  "description": "my first socket.io app",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "connect": "^3.6.5",
+    "express": "^4.16.2",
+    "global": "^4.3.2",
+    "https": "^1.0.0",
+    "jQuery": "^1.7.4",
+    "jsdom": "^11.3.0",
+    "materialize-css": "^0.100.2",
+    "mysql": "^2.15.0",
+    "serve-index": "^1.9.1",
+    "serve-static": "^1.13.1",
+    "socket.io": "^1.7.4",
+    "socket.io-emitter": "^3.1.1"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
