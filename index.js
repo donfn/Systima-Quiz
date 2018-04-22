@@ -57,13 +57,16 @@ console.log('  › Σύνδεση στην βάση δεδομένων επιτ�
 con.query("SELECT `value` FROM main WHERE datatype='maxlevel'", function (err, result, fields) {
 			GLOBAL.maxlevel = result[0].value;     
 });
-
+GLOBAL.server_status = null;
 //Αυτό το function βρίσκει το στάτους του συστήματος και το μεταδίδει στους πελάτες.
 function emit_status(){
-		con.connect(function() { //ΣΥΝΔΕΣΗ MYSQL
+     con.connect(function() { //ΣΥΝΔΕΣΗ MYSQL
        con.query("SELECT value FROM main WHERE datatype = 'status'", function (err, result, fields) {
-          clients.emit('init_data', result); //ΑΠΟΣΤΟΛΗ ΜΕΣΩ SOCKET.IO
-          admin.emit('init_data', result);
+	       if(GLOBAL.server_status !== result){
+		       GLOBAL.server_status = result;
+                       clients.emit('init_data', result); //ΑΠΟΣΤΟΛΗ ΜΕΣΩ SOCKET.IO
+                       admin.emit('init_data', result);
+	       };
        });
      });
 }
