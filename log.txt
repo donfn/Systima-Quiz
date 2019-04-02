@@ -1,8 +1,0 @@
-  › Σύνδεση στην βάση δεδομένων επιτυχής
-  › Εκκίνηση server επιτυχής
-  › Νέο μαθητικό τερματικό με ID:/clients/#MLKXAI6uFVsqH4JHAAAA
-  › O διαχειριστής έχει ID:/admin/#bCYAbGf5YCNmKq2fAAAB
-  › Νέο μαθητικό τερματικό με ID:/clients/#CxjhVByhX90XEMNaAAAC
-  › O διαχειριστής έχει ID:/admin/#saHSfu_xJxcYY3GCAAAD
-  › Νέο μαθητικό τερματικό με ID:/clients/#pIQs284-AEdcLTKvAAAE
-  › Νέο μαθητικό τερματικό με ID:/clients/#Ps725744mbIajc8tAAAF
